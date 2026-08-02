@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -59,9 +60,20 @@ public class Cart {
         this.userId = userId;
     }
 
-    // Creates a new CartItem owned by this cart and adds it to the in-memory list.
+    // Adding a product already present in the cart increases its quantity rather than creating a
+    // duplicate line item for the same product - this matches standard e-commerce cart behavior
+    // and fixes a real bug found during live saga testing, where adding the same product twice
+    // produced two separate order_items rows for one product instead of one row with qty=2.
     public void addItem(UUID productId, int qty, long unitPriceCents) {
-        items.add(new CartItem(this, productId, qty, unitPriceCents));
+        Optional<CartItem> existing = items.stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
+
+        if (existing.isPresent()) {
+            existing.get().increaseQty(qty);
+        } else {
+            items.add(new CartItem(this, productId, qty, unitPriceCents));
+        }
     }
 
     // Computed fresh every time, never stored, for the same reasoning as CartItem.lineTotalCents().
