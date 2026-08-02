@@ -23,7 +23,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping("/{id}")
-    public OrderResponse getOrder(@AuthenticationPrincipal UUID userId, @PathVariable UUID id) {
+    public OrderResponse getOrder(@AuthenticationPrincipal UUID userId, @PathVariable("id") UUID id) {
         return orderService.getOrder(userId, id);
     }
 
