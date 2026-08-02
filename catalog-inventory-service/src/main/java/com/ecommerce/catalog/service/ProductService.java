@@ -54,7 +54,14 @@ public class ProductService {
                 request.priceCents(),
                 request.currency());
 
-        Product savedProduct = productRepository.save(product);
+        // saveAndFlush is required here (not plain save) because @CreationTimestamp on
+        // Product.createdAt is only populated by Hibernate at flush time, which is normally
+        // deferred until transaction commit; since this method immediately maps the saved product
+        // to a response DTO via toProductResponse, we must force the flush now so createdAt is
+        // populated before it's read, otherwise the API response would incorrectly show createdAt
+        // as null even though the database row has the correct value (same bug and fix as
+        // AuthService.register() in auth-service).
+        Product savedProduct = productRepository.saveAndFlush(product);
 
         // These two saves happen inside the same @Transactional method deliberately: a Product should
         // never exist without a corresponding Inventory row, so if the Inventory save somehow failed,
