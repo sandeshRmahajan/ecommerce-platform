@@ -53,4 +53,11 @@ public class CartItem {
     public long lineTotalCents() {
         return qty * unitPriceCents;
     }
+
+    // Named, intention-revealing method instead of a raw qty setter, consistent with this
+    // project's established pattern of avoiding blanket setters on entities (e.g.
+    // User.suspend()/activate(), RefreshToken.revoke()).
+    public void increaseQty(int additionalQty) {
+        this.qty += additionalQty;
+    }
 }
