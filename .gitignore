@@ -1,0 +1,24 @@
+# Maven build output
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
+
+# Logs
+*.log
+
+.metadata/
+.claude/

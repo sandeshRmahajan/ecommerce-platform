@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+# This MUST be the exact same secret value as auth-service's auth.jwt.secret, since this service validates tokens signed by auth-service using a shared HMAC key — if the two ever diverge, every token validation in this service will fail.
+auth:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-in-production-min-32-chars-long}
+
+spring:
+  application:
+    name: catalog-inventory-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}?currentSchema=catalog
+    username: ${DB_USERNAME:catalog_user}
+    password: ${DB_PASSWORD:catalog_password}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    schemas: catalog
+    default-schema: catalog
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

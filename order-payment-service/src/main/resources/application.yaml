@@ -1,0 +1,43 @@
+server:
+  port: 8083
+
+# This MUST be the exact same secret value as auth-service's auth.jwt.secret, since this service validates tokens signed by auth-service using a shared HMAC key — if the two ever diverge, every token validation in this service will fail.
+auth:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-in-production-min-32-chars-long}
+
+spring:
+  application:
+    name: order-payment-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}?currentSchema=order_payment
+    username: ${DB_USERNAME:order_payment_user}
+    password: ${DB_PASSWORD:order_payment_password}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    schemas: order_payment
+    default-schema: order_payment
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  kafka:
+    # Spring Kafka's producer/consumer clients read this to locate the broker, matching the port Kafka is listening on via Docker
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-in-production-min-32-chars-long}
+    access-token-ttl-seconds: 900
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}?currentSchema=auth
+    username: ${DB_USERNAME:auth_user}
+    password: ${DB_PASSWORD:auth_password}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    schemas: auth
+    default-schema: auth
+    locations: classpath:db/migration
+    baseline-on-migrate: true
