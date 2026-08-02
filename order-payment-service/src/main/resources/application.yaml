@@ -11,7 +11,12 @@ spring:
     name: order-payment-service
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}?currentSchema=order_payment
+    # stringtype=unspecified tells the PostgreSQL JDBC driver not to force String parameters to be bound with an explicit varchar type,
+    # allowing PostgreSQL to correctly infer/cast the parameter type (e.g. to jsonb) based on the target column instead - this resolves
+    # a known Hibernate 6 + PostgreSQL JDBC driver issue where UPDATE statements on JSONB-mapped columns can fail with
+    # "column is of type jsonb but expression is of type character varying", even though INSERT statements on the same column work
+    # correctly, due to different parameter-binding code paths between the two statement types in the driver.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce}?currentSchema=order_payment&stringtype=unspecified
     username: ${DB_USERNAME:order_payment_user}
     password: ${DB_PASSWORD:order_payment_password}
 
